@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  slug           String    @unique
+  description    String?
+  image          String?
+  isFeatured     Boolean   @default(false)
+  seoTitle       String?
+  seoDescription String?
+  products       Product[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Product {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  slug             String   @unique
+  shortDescription String
+  description      String
+  
+  category         Category @relation(fields: [categoryId], references: [id])
+  categoryId       String   @db.ObjectId
+  
+  fabricType       String
+  roomType         String
+  headerStyles     String[]
+  lightControl     String
+
+  pricePerMeter    Float
+  retailPrice      Float?
+  highDemand       Boolean  @default(false)
+  images           Json     // Array of {url, alt}
+  colors           String[]
+  qualities        Json     // Array of {name, pricePerMeter}
+  specifications   Json     // {material, width, countryOfOrigin, lightBlocking}
+  
+  featured         Boolean  @default(false)
+  available        Boolean  @default(true)
+  seoTitle         String?
+  seoDescription   String?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Order {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber  String   @unique
+  customerName String
+  phoneNumber  String
+  email        String?
+  county       String
+  town         String
+  address      String
+  notes        String?
+  
+  items        Json     // Array of items
+  subtotal     Float
+  status       String   @default("NEW")
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model CustomRequest {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  customerName String
+  phoneNumber  String
+  email        String?
+  windowWidth  Float
+  windowHeight Float
+  roomType     String
+  photos       String[] // Array of URLs
+  notes        String?
+  status       String   @default("NEW")
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Testimonial {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  customerName String
+  message      String
+  rating       Int
+  image        String?
+  featured     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+}
+
+model ContactSubmission {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String?
+  phone     String
+  subject   String
+  message   String
+  status    String   @default("UNREAD")
+  createdAt DateTime @default(now())
+}
