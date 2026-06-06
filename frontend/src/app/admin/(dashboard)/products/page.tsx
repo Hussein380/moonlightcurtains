@@ -182,56 +182,103 @@ export default function AdminProductsPage() {
             No products found. Click "Add New Fabric" to get started.
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-zinc-50 text-zinc-600 border-b border-zinc-200">
-                <tr>
-                  <th className="p-4 font-medium">Product</th>
-                  <th className="p-4 font-medium">Category / Room</th>
-                  <th className="p-4 font-medium">Price/Meter</th>
-                  <th className="p-4 font-medium text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-100">
-                {products?.map((product: any) => (
-                  <tr key={product.id} className="hover:bg-zinc-50 transition-colors">
-                    <td className="p-4 flex items-center gap-4">
-                      <div className="relative w-12 h-12 rounded-md overflow-hidden bg-zinc-100 flex-shrink-0">
-                        {product.images?.[0]?.url ? (
-                          <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />
-                        ) : null}
+          <>
+            {/* Mobile/Tablet Card View (hidden on desktop) */}
+            <div className="md:hidden divide-y divide-zinc-100">
+              {products?.map((product: any) => (
+                <div key={product.id} className="p-4 flex items-center justify-between gap-4 hover:bg-zinc-50 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 border border-zinc-100">
+                      {product.images?.[0]?.url ? (
+                        <Image src={product.images[0].url} alt={product.name} fill className="object-cover animate-fade-in" />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-zinc-900 text-sm truncate">{product.name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full font-medium">
+                          {product.roomType || "Living Room"}
+                        </span>
+                        <span className="text-xs font-bold text-[#D4AF37]">
+                          {formatPrice(product.pricePerMeter)}
+                        </span>
                       </div>
-                      <span className="font-medium text-zinc-900">{product.name}</span>
-                    </td>
-                    <td className="p-4 text-zinc-600">
-                      {product.roomType || "Living Room"}
-                    </td>
-                    <td className="p-4 font-medium text-[#D4AF37]">
-                      {formatPrice(product.pricePerMeter)}
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button 
-                          onClick={() => handleOpenEdit(product)}
-                          className="p-2 text-zinc-400 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(product.id)}
-                          className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+                    </div>
+                  </div>
+                  
+                  {/* Actions */}
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button 
+                      onClick={() => handleOpenEdit(product)}
+                      className="p-2 text-zinc-500 hover:text-blue-600 hover:bg-blue-50 active:bg-blue-100 rounded-lg transition-colors"
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(product.id)}
+                      className="p-2 text-zinc-500 hover:text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (hidden on mobile) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-zinc-50 text-zinc-600 border-b border-zinc-200">
+                  <tr>
+                    <th className="p-4 font-medium">Product</th>
+                    <th className="p-4 font-medium">Category / Room</th>
+                    <th className="p-4 font-medium">Price/Meter</th>
+                    <th className="p-4 font-medium text-right">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-zinc-100">
+                  {products?.map((product: any) => (
+                    <tr key={product.id} className="hover:bg-zinc-50 transition-colors">
+                      <td className="p-4 flex items-center gap-4">
+                        <div className="relative w-12 h-12 rounded-md overflow-hidden bg-zinc-100 flex-shrink-0">
+                          {product.images?.[0]?.url ? (
+                            <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />
+                          ) : null}
+                        </div>
+                        <span className="font-medium text-zinc-900">{product.name}</span>
+                      </td>
+                      <td className="p-4 text-zinc-600">
+                        {product.roomType || "Living Room"}
+                      </td>
+                      <td className="p-4 font-medium text-[#D4AF37]">
+                        {formatPrice(product.pricePerMeter)}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button 
+                            onClick={() => handleOpenEdit(product)}
+                            className="p-2 text-zinc-400 hover:text-blue-500 hover:bg-blue-50 rounded-md transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(product.id)}
+                            className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
