@@ -4,6 +4,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ShieldCheck, Loader2 } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 export default function CheckoutPage() {
   const [mounted, setMounted] = useState(false);
@@ -42,7 +43,7 @@ export default function CheckoutPage() {
 
     try {
       // 1. Save order to backend so Admin sees it in Dashboard
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${API_BASE}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

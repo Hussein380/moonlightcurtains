@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Star, Truck, ShieldCheck, Ruler, Scissors, Home as HomeIcon } from "lucide-react";
 import useSWR from "swr";
+import { API_BASE } from "@/lib/api";
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -12,7 +13,7 @@ const fetcher = async (url: string) => {
 };
 
 export default function Home() {
-  const { data: rawProducts } = useSWR("http://localhost:5000/api/products", fetcher);
+  const { data: rawProducts } = useSWR(`${API_BASE}/products`, fetcher);
   const products: any[] = Array.isArray(rawProducts) ? rawProducts.slice(0, 4) : [];
 
   const formatPrice = (p: number) =>

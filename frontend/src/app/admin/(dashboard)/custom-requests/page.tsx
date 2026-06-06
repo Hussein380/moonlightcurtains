@@ -2,6 +2,8 @@
 
 import useSWR, { mutate } from "swr";
 import { Loader2, MessageCircle, Ruler, ClipboardList } from "lucide-react";
+import { API_BASE } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -22,16 +24,19 @@ function getStatusStyle(status: string) {
 }
 
 export default function AdminCustomRequestsPage() {
-  const API = "http://localhost:5000/api/requests";
+  const API = `${API_BASE}/requests`;
   const { data: rawRequests, error, isLoading } = useSWR(API, fetcher);
   const requests: any[] = Array.isArray(rawRequests) ? rawRequests : [];
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     mutate(API, requests.map(r => r.id === id ? { ...r, status: newStatus } : r), false);
     try {
-      await fetch(`http://localhost:5000/api/requests/${id}/status`, {
+      await fetch(`${API_BASE}/requests/${id}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getAuthToken()}`
+        },
         body: JSON.stringify({ status: newStatus }),
       });
     } catch {

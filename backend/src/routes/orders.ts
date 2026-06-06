@@ -1,6 +1,7 @@
 import express from 'express';
 import { prisma } from '../lib/prisma';
 import { redisGet, redisSet, redisDel } from '../lib/redis';
+import { requireAuth } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -51,8 +52,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update order status
-router.patch('/:id/status', async (req, res) => {
+// Update order status (Protected — admin only)
+router.patch('/:id/status', requireAuth, async (req, res) => {
   try {
     const { status } = req.body;
     const order = await prisma.order.update({
@@ -67,8 +68,8 @@ router.patch('/:id/status', async (req, res) => {
   }
 });
 
-// Delete order
-router.delete('/:id', async (req, res) => {
+// Delete order (Protected — admin only)
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     await prisma.order.delete({ where: { id: req.params.id } });
     await redisDel('admin:stats');

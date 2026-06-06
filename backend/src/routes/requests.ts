@@ -1,5 +1,6 @@
 import express from 'express';
 import { prisma } from '../lib/prisma';
+import { requireAuth } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -40,8 +41,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Update request status
-router.patch('/:id/status', async (req, res) => {
+// Update request status (Protected — admin only)
+router.patch('/:id/status', requireAuth, async (req, res) => {
   try {
     const { status } = req.body;
     const request = await prisma.customRequest.update({

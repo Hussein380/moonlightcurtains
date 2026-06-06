@@ -15,7 +15,11 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
   const token = authHeader.split(' ')[1];
   
   try {
-    const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET || 'fallback_secret');
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    throw new Error('FATAL: NEXTAUTH_SECRET environment variable is not set. Server cannot start.');
+  }
+  const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (err) {

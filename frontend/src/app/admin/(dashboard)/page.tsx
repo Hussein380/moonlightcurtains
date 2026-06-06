@@ -3,11 +3,12 @@
 import { DollarSign, ShoppingBag, Clock } from "lucide-react";
 import Link from "next/link";
 import useSWR from "swr";
+import { API_BASE } from "@/lib/api";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function AdminDashboardPage() {
-  const { data: stats, error } = useSWR("http://localhost:5000/api/orders/stats", fetcher);
+  const { data: stats, error } = useSWR(`${API_BASE}/orders/stats`, fetcher);
 
   if (error) return <div className="p-10 text-red-500">Failed to load dashboard</div>;
   if (!stats) return <div className="p-10 text-zinc-500">Loading dashboard data...</div>;

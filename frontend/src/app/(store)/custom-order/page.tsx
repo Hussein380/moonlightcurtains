@@ -4,6 +4,7 @@ import { useState } from "react";
 import { MessageCircle, Loader2, CheckCircle } from "lucide-react";
 import { CldUploadWidget } from "next-cloudinary";
 import { UploadCloud } from "lucide-react";
+import { API_BASE } from "@/lib/api";
 
 export default function CustomOrderPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +33,7 @@ export default function CustomOrderPage() {
     }
     setIsSubmitting(true);
     try {
-      const res = await fetch("http://localhost:5000/api/requests", {
+      const res = await fetch(`${API_BASE}/requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

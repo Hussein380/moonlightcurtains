@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Minus, Plus, ShoppingCart, Star, AlertCircle } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
+import { API_BASE } from "@/lib/api";
 
 // Type matching our backend product structure
 interface Product {
@@ -33,7 +34,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
 
   useEffect(() => {
     // Fetch product from Decoupled Express API
-    fetch(`http://localhost:5000/api/products/${params.slug}`)
+    fetch(`${API_BASE}/products/${params.slug}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
         return res.json();

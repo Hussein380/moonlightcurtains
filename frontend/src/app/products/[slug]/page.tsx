@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ProductClient from "./ProductClient";
+import { API_BASE } from "@/lib/api";
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -8,8 +9,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
-    const res = await fetch(`${API_URL}/products/${resolvedParams.slug}`);
+    const res = await fetch(`${API_BASE}/products/${resolvedParams.slug}`);
     if (!res.ok) return { title: "Product Not Found | Moonlight Star Fashion" };
     const product = await res.json();
     

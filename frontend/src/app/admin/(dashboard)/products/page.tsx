@@ -6,6 +6,7 @@ import ImageUpload from "@/components/admin/ImageUpload";
 import useSWR, { mutate } from "swr";
 import Image from "next/image";
 import { getAuthToken } from "@/lib/auth";
+import { API_BASE } from "@/lib/api";
 
 const COMMON_COLORS = [
   "White", "Off-White", "Beige", "Cream", "Grey", "Charcoal", "Black", 
@@ -20,7 +21,7 @@ const fetcher = async (url: string) => {
 };
 
 export default function AdminProductsPage() {
-  const { data: rawProducts, error, isLoading } = useSWR("http://localhost:5000/api/products", fetcher);
+  const { data: rawProducts, error, isLoading } = useSWR(`${API_BASE}/products`, fetcher);
   const products: any[] = Array.isArray(rawProducts)
     ? rawProducts
     : typeof rawProducts === 'string'
@@ -85,21 +86,20 @@ export default function AdminProductsPage() {
     if (!confirm("Are you sure you want to delete this product? This action cannot be undone.")) return;
     
     try {
-      // Optimistic update
-      mutate("http://localhost:5000/api/products", products.filter((p: any) => p.id !== id), false);
+      mutate(`${API_BASE}/products`, products.filter((p: any) => p.id !== id), false);
       
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, { 
+      const response = await fetch(`${API_BASE}/products/${id}`, { 
         method: "DELETE",
         headers: { "Authorization": `Bearer ${getAuthToken()}` }
       });
       if (!response.ok) throw new Error("Failed to delete product");
       
       // Revalidate
-      mutate("http://localhost:5000/api/products");
+      mutate(`${API_BASE}/products`);
     } catch (error) {
       console.error(error);
       alert("Failed to delete product");
-      mutate("http://localhost:5000/api/products");
+      mutate(`${API_BASE}/products`);
     }
   };
 
@@ -114,8 +114,8 @@ export default function AdminProductsPage() {
 
     try {
       const url = editingId 
-        ? `http://localhost:5000/api/products/${editingId}` 
-        : "http://localhost:5000/api/products";
+        ? `${API_BASE}/products/${editingId}` 
+        : `${API_BASE}/products`;
       
       const method = editingId ? "PUT" : "POST";
 
@@ -141,12 +141,12 @@ export default function AdminProductsPage() {
 
       if (!response.ok) throw new Error("Failed to save product");
 
-      await mutate("http://localhost:5000/api/products");
+      await mutate(`${API_BASE}/products`);
       setIsModalOpen(false);
       resetForm();
     } catch (error: any) {
       alert(error.message || "An error occurred");
-      await mutate("http://localhost:5000/api/products");
+      await mutate(`${API_BASE}/products`);
     } finally {
       setIsSubmitting(false);
     }

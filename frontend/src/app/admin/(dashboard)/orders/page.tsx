@@ -2,6 +2,8 @@
 
 import useSWR, { mutate } from "swr";
 import { Loader2, PhoneCall, MapPin, Package, Trash2 } from "lucide-react";
+import { API_BASE } from "@/lib/api";
+import { getAuthToken } from "@/lib/auth";
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -22,7 +24,7 @@ function getStatusStyle(status: string) {
 }
 
 export default function AdminOrdersPage() {
-  const API = "http://localhost:5000/api/orders";
+  const API = `${API_BASE}/orders`;
   const { data: rawOrders, error, isLoading } = useSWR(API, fetcher);
   const orders: any[] = Array.isArray(rawOrders) ? rawOrders : [];
 
@@ -33,16 +35,19 @@ export default function AdminOrdersPage() {
     // Optimistic update
     mutate(API, orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o), false);
     try {
-      await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      await fetch(`${API_BASE}/orders/${orderId}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${getAuthToken()}`
+        },
         body: JSON.stringify({ status: newStatus }),
       });
     } catch {
       alert("Failed to update status. Please try again.");
     }
     mutate(API);
-    mutate("http://localhost:5000/api/orders/stats");
+    mutate(`${API_BASE}/orders/stats`);
   };
 
   const handleDeleteOrder = async (orderId: string) => {
@@ -51,11 +56,12 @@ export default function AdminOrdersPage() {
     // Optimistic update
     mutate(API, orders.filter(o => o.id !== orderId), false);
     try {
-      await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+      await fetch(`${API_BASE}/orders/${orderId}`, {
         method: "DELETE",
+        headers: { "Authorization": `Bearer ${getAuthToken()}` }
       });
       mutate(API);
-      mutate("http://localhost:5000/api/orders/stats");
+      mutate(`${API_BASE}/orders/stats`);
     } catch {
       alert("Failed to delete order. Please try again.");
       mutate(API);
