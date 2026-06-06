@@ -120,7 +120,7 @@ export default function AdminOrdersPage() {
                   </div>
                 </div>
 
-                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Customer */}
                   <div>
                     <p className="text-xs text-zinc-400 uppercase tracking-wider mb-2">Customer</p>
@@ -168,9 +168,9 @@ export default function AdminOrdersPage() {
                     <p className="text-xs text-zinc-400 uppercase tracking-wider mb-2">Items Ordered</p>
                     <div className="space-y-1">
                       {items.map((item: any, i: number) => (
-                        <div key={i} className="flex justify-between text-sm text-zinc-700">
-                          <span>{item.name} — {item.color} × {item.meters}m</span>
-                          <span className="font-medium">{formatPrice(item.totalPrice)}</span>
+                        <div key={i} className="flex flex-wrap sm:flex-nowrap justify-between items-start gap-2 text-sm text-zinc-700">
+                          <span className="break-words">{item.name} — {item.color} × {item.meters}m</span>
+                          <span className="font-medium whitespace-nowrap">{formatPrice(item.totalPrice)}</span>
                         </div>
                       ))}
                     </div>

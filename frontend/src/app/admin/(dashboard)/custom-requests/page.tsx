@@ -103,7 +103,7 @@ export default function AdminCustomRequestsPage() {
                   </select>
                 </div>
 
-                <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
                   {/* Customer */}
                   <div>
                     <p className="text-xs text-zinc-400 uppercase tracking-wider mb-2">Customer</p>
