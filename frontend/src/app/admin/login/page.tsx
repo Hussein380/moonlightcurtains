@@ -2,35 +2,33 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, ArrowRight } from "lucide-react";
+import { Lock, Mail, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { setAuthToken } from "@/lib/auth";
+import { API_BASE } from "@/lib/api";
 
 export default function AdminLoginPage() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const res = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // We hardcode the email to keep the UI simple with just a "Master Password" field
-        body: JSON.stringify({ 
-          email: "moonlightcurtainshop@gmail.com", 
-          password: password 
-        }),
+        body: JSON.stringify({ email, password }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        // Save the secure JWT token
         setAuthToken(data.token);
-        router.push("/admin/products");
+        router.push("/admin");
       } else {
         setError(true);
         setTimeout(() => setError(false), 3000);
@@ -39,6 +37,8 @@ export default function AdminLoginPage() {
       console.error("Login error:", err);
       setError(true);
       setTimeout(() => setError(false), 3000);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -59,27 +59,44 @@ export default function AdminLoginPage() {
           <p className="text-zinc-500 text-sm">Please sign in to access the control panel</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-zinc-700 mb-2">Master Password</label>
+            <label className="block text-sm font-medium text-zinc-700 mb-2">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full border border-zinc-300 rounded-md pl-10 pr-3 py-3 focus:ring-[#D4AF37] focus:border-[#D4AF37]" 
+                placeholder="admin@email.com" 
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-zinc-700 mb-2">Password</label>
             <input 
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
               className="w-full border border-zinc-300 rounded-md p-3 focus:ring-[#D4AF37] focus:border-[#D4AF37]" 
               placeholder="••••••••" 
             />
           </div>
 
           {error && (
-            <p className="text-red-500 text-sm text-center">Incorrect password. Please try again.</p>
+            <p className="text-red-500 text-sm text-center">Incorrect credentials. Please try again.</p>
           )}
 
           <button 
             type="submit" 
-            className="w-full bg-[#D4AF37] hover:bg-[#C5A059] text-white p-3 rounded-md font-bold transition-colors flex items-center justify-center gap-2"
+            disabled={isSubmitting}
+            className="w-full bg-[#D4AF37] hover:bg-[#C5A059] text-white p-3 rounded-md font-bold transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
           >
-            Access Dashboard <ArrowRight className="w-5 h-5" />
+            {isSubmitting ? "Signing in..." : <>Access Dashboard <ArrowRight className="w-5 h-5" /></>}
           </button>
         </form>
       </div>
