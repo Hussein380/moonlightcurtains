@@ -3,6 +3,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import { prisma } from './lib/prisma';
 import productRoutes from './routes/products';
 import orderRoutes from './routes/orders';
 import requestRoutes from './routes/requests';
@@ -12,7 +13,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Restrict CORS to only allow requests from our frontend domain
+// Restrict CORS to allow requests from our frontend domain, localhost, and Vercel subdomains
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
   'https://moonlightcurtains.vercel.app',
@@ -21,11 +22,20 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, server-to-server)
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    if (!origin) {
+      return callback(null, true);
     }
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Dynamically allow Vercel previews and localhost on any port
+    if (origin.endsWith('.vercel.app') || /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));
@@ -52,8 +62,50 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/requests', publicPostLimiter, requestRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Moonlight Curtains API is running' });
+app.get('/api/health', async (req, res) => {
+  try {
+    const dbUrlSet = !!process.env.DATABASE_URL;
+    const jwtSecretSet = !!process.env.NEXTAUTH_SECRET;
+    
+    let dbStatus = 'not_tested';
+    let dbError = null;
+
+    if (dbUrlSet) {
+      try {
+        // Query the database to ensure connection is working
+        await prisma.user.findFirst();
+        dbStatus = 'connected';
+      } catch (err: any) {
+        dbStatus = 'connection_failed';
+        dbError = err.message || String(err);
+      }
+    } else {
+      dbStatus = 'missing_database_url';
+    }
+
+    const allOk = dbStatus === 'connected' && jwtSecretSet;
+
+    res.status(allOk ? 200 : 500).json({
+      status: allOk ? 'ok' : 'error',
+      message: allOk ? 'Moonlight Curtains API is fully operational' : 'Moonlight Curtains API has configuration errors',
+      timestamp: new Date().toISOString(),
+      env: {
+        DATABASE_URL_configured: dbUrlSet,
+        NEXTAUTH_SECRET_configured: jwtSecretSet,
+        NODE_ENV: process.env.NODE_ENV || 'development'
+      },
+      database: {
+        status: dbStatus,
+        error: dbError
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Unexpected health check failure',
+      error: err.message || String(err)
+    });
+  }
 });
 
 if (process.env.NODE_ENV !== 'production') {

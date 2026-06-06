@@ -1,8 +1,22 @@
-/**
- * Central API configuration.
- * ALL fetch calls in the frontend must use API_BASE — never hardcode localhost.
- *
- * In production: set NEXT_PUBLIC_API_URL to your deployed backend URL in Vercel.
- * In development: falls back to localhost:5000.
- */
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+const getApiBase = (): string => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  if (typeof window !== "undefined") {
+    // Client-side: if not on localhost, use the relative backend service route prefix
+    const hostname = window.location.hostname;
+    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+      return `${window.location.origin}/_/backend/api`;
+    }
+  } else if (process.env.VERCEL_URL) {
+    // Server-side on Vercel: use Vercel system variable to build the absolute URL
+    return `https://${process.env.VERCEL_URL}/_/backend/api`;
+  }
+  
+  // Default to local development backend
+  return "http://localhost:5000/api";
+};
+
+export const API_BASE = getApiBase();
+
