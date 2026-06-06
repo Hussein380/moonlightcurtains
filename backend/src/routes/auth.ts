@@ -23,9 +23,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    const secret = process.env.NEXTAUTH_SECRET;
+    if (!secret) throw new Error('NEXTAUTH_SECRET is not set');
     const token = jwt.sign(
       { id: user.id, role: user.role },
-      process.env.NEXTAUTH_SECRET || 'fallback_secret', // Reusing the secret for simplicity
+      secret,
       { expiresIn: '1d' }
     );
 
