@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Loader2, Search, Filter } from "lucide-react";
 import useSWR from "swr";
+import { API_BASE } from "@/lib/api";
 
 const fetcher = async (url: string) => {
   const res = await fetch(url);
@@ -87,9 +88,7 @@ export default function ShopPage() {
   if (search) queryParams.append("search", search);
   if (roomType !== "All") queryParams.append("roomType", roomType);
 
-  // In a unified Vercel deployment, the API is available at the same domain under /api
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
-  const url = `${API_URL}/products?${queryParams.toString()}`;
+  const url = `${API_BASE}/products?${queryParams.toString()}`;
 
   const { data: rawProducts, error, isLoading } = useSWR(url, fetcher);
   const products: any[] = Array.isArray(rawProducts) ? rawProducts : [];
