@@ -57,7 +57,7 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
   try {
     const { status } = req.body;
     const order = await prisma.order.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: { status }
     });
     await redisDel('admin:stats');
@@ -71,7 +71,7 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
 // Delete order (Protected — admin only)
 router.delete('/:id', requireAuth, async (req, res) => {
   try {
-    await prisma.order.delete({ where: { id: req.params.id } });
+    await prisma.order.delete({ where: { id: req.params.id as string } });
     await redisDel('admin:stats');
     res.status(204).send();
   } catch (error: any) {

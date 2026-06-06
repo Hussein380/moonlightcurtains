@@ -46,7 +46,7 @@ router.patch('/:id/status', requireAuth, async (req, res) => {
   try {
     const { status } = req.body;
     const request = await prisma.customRequest.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: { status }
     });
     res.json(request);
