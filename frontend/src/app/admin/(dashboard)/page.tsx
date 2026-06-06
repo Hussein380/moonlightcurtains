@@ -25,7 +25,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Simple Big Metric Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <Link href="/admin/orders" className="block bg-[#D4AF37] hover:bg-[#C5A059] transition-all hover:-translate-y-1 text-white p-8 rounded-xl shadow-md cursor-pointer">
           <div className="flex items-center gap-3 mb-4 opacity-90">
             <DollarSign className="w-8 h-8" />
@@ -70,9 +70,9 @@ export default function AdminDashboardPage() {
                 <div className="w-12 h-12 bg-green-100 text-green-600 rounded-full flex items-center justify-center flex-shrink-0">
                   <ShoppingBag className="w-6 h-6" />
                 </div>
-                <div>
-                  <p className="text-lg font-medium text-zinc-900">New order from {activity.customerName}</p>
-                  <p className="text-zinc-500">KSh {(activity.subtotal || 0).toLocaleString()} • {new Date(activity.createdAt).toLocaleDateString()}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="text-lg font-medium text-zinc-900 truncate">New order from {activity.customerName}</p>
+                  <p className="text-zinc-500 text-sm">KSh {(activity.subtotal || 0).toLocaleString()} • {new Date(activity.createdAt).toLocaleDateString()}</p>
                 </div>
               </Link>
             ))
