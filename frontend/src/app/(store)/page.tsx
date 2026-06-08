@@ -32,11 +32,11 @@ export default function Home() {
         <div className="relative z-20 w-full px-4 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           {/* Left Text Content */}
           <div className="lg:col-span-7 flex flex-col items-start text-left">
-            <span className="text-[#D4AF37] font-bold tracking-wider uppercase text-sm md:text-base mb-4">
+            <span className="text-[#D4AF37] bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full font-bold tracking-wider uppercase text-xs md:text-sm mb-6 border border-white/50 shadow-sm inline-block">
               Welcome to Moonlight Star Fashion
             </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-zinc-900 mb-6 leading-tight max-w-3xl">
-              High-Quality, Affordable Curtains from <span className="text-[#D4AF37]">Eastleigh.</span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-zinc-900 mb-6 leading-tight max-w-3xl drop-shadow-sm">
+              High-Quality, Affordable Curtains from <span className="text-[#D4AF37] drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">Eastleigh.</span>
             </h1>
             <p className="text-lg md:text-xl text-zinc-600 mb-10 max-w-2xl leading-relaxed">
               Transform your home with premium Turkish fabrics, elegant sheers, and room-darkening blackouts. Sold by the meter at unbeatable Eastleigh prices, delivered straight to your door anywhere in Kenya.
