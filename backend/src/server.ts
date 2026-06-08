@@ -17,6 +17,8 @@ const PORT = process.env.PORT || 5000;
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
   'https://moonlightcurtains.vercel.app',
+  'https://www.moonlightcurtains.co.ke',
+  'https://moonlightcurtains.co.ke'
 ];
 
 app.use(cors({
