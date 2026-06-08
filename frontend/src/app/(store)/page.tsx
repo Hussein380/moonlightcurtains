@@ -52,7 +52,7 @@ export default function Home() {
           </div>
 
           {/* Right Floating Card (Latest Arrival) */}
-          <div className="hidden lg:flex lg:col-span-5 justify-end">
+          <div className="flex lg:col-span-5 justify-center lg:justify-end mt-10 lg:mt-0 w-full px-4 lg:px-0">
             {products.length > 0 && (
               <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-2xl border border-white max-w-sm w-full animate-fade-in-up transform hover:-translate-y-2 transition-all duration-300">
                 <div className="flex justify-between items-center mb-3 px-2">
