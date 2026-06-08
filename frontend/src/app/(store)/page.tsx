@@ -22,7 +22,7 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center">
       {/* HERO SECTION */}
-      <section className="relative w-full h-[600px] md:h-[80vh] min-h-[600px] flex items-center justify-center bg-zinc-50 overflow-hidden">
+      <section className="relative w-full min-h-[600px] md:h-[80vh] flex items-center justify-center bg-zinc-50 overflow-hidden py-20 lg:py-0">
         {/* Bright white gradient overlay instead of black */}
         <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/60 to-transparent z-10" />
         

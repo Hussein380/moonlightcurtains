@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MeterCalculator } from "@/components/MeterCalculator";
 import { MessageCircle, Check, Loader2, ChevronLeft } from "lucide-react";
 import Link from "next/link";
+import { API_BASE } from "@/lib/api";
 
 export default function ProductClient({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = use(params);
@@ -15,8 +16,7 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
-        const res = await fetch(`${API_URL}/products/${resolvedParams.slug}`);
+        const res = await fetch(`${API_BASE}/products/${resolvedParams.slug}`);
         if (res.ok) {
           const data = await res.json();
           setProduct(data);
