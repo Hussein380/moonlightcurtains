@@ -19,12 +19,16 @@ export function Footer() {
         </div>
         <div>
           <h4 className="text-white font-semibold mb-4">Contact Info</h4>
-          <ul className="space-y-2 text-sm">
-            <li>Emirates Shopping Mall, Shop No. 1</li>
-            <li>9th Street, Eastleigh, Nairobi</li>
-            <li>Phone: 0704626085</li>
-            <li>WhatsApp: 0704626085</li>
-            <li>Email: moonlightcurtainshop@gmail.com</li>
+          <ul className="space-y-3 text-sm">
+            <li>
+              <a href="https://maps.google.com/?q=Emirates+Shopping+Mall,+9th+Street,+Eastleigh,+Nairobi" target="_blank" rel="noreferrer" className="hover:text-[#D4AF37] transition-colors block leading-relaxed">
+                Emirates Shopping Mall, Shop No. 1<br />
+                9th Street, Eastleigh, Nairobi
+              </a>
+            </li>
+            <li>Phone: <a href="tel:+254704626085" className="hover:text-[#D4AF37] transition-colors">0704626085</a></li>
+            <li>WhatsApp: <a href="https://wa.me/254704626085" target="_blank" rel="noreferrer" className="hover:text-[#D4AF37] transition-colors">0704626085</a></li>
+            <li>Email: <a href="mailto:moonlightcurtainshop@gmail.com" className="hover:text-[#D4AF37] transition-colors">moonlightcurtainshop@gmail.com</a></li>
           </ul>
         </div>
         <div>

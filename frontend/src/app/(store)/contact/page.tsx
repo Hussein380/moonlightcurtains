@@ -13,7 +13,11 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="text-xl font-bold mb-2">Our Location</h3>
-              <p className="text-zinc-600">Emirates Shopping Mall, Shop No. 1<br />9th Street, Eastleigh<br />Nairobi, Kenya</p>
+              <a href="https://maps.google.com/?q=Emirates+Shopping+Mall,+9th+Street,+Eastleigh,+Nairobi" target="_blank" rel="noreferrer" className="text-zinc-600 hover:text-[#D4AF37] transition-colors block">
+                Emirates Shopping Mall, Shop No. 1<br />
+                9th Street, Eastleigh<br />
+                Nairobi, Kenya
+              </a>
             </div>
           </div>
           
@@ -23,7 +27,11 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="text-xl font-bold mb-2">Call Us</h3>
-              <p className="text-zinc-600">0704 626 085<br />0715 153 820<br />0726 585 787</p>
+              <div className="text-zinc-600 flex flex-col gap-1">
+                <a href="tel:+254704626085" className="hover:text-[#D4AF37] transition-colors">0704 626 085</a>
+                <a href="tel:+254715153820" className="hover:text-[#D4AF37] transition-colors">0715 153 820</a>
+                <a href="tel:+254726585787" className="hover:text-[#D4AF37] transition-colors">0726 585 787</a>
+              </div>
             </div>
           </div>
 
