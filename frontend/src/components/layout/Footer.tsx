@@ -34,8 +34,7 @@ export function Footer() {
         <div>
           <h4 className="text-white font-semibold mb-4">Store Hours</h4>
           <ul className="space-y-2 text-sm">
-            <li>Mon - Sat: 8:00 AM - 6:00 PM</li>
-            <li>Sunday: Closed</li>
+            <li>Mon - Sun: 7:00 AM - 9:00 PM</li>
           </ul>
         </div>
       </div>
