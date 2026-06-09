@@ -47,7 +47,7 @@ export default function CartPage() {
                 <div key={item.id} className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-zinc-100 flex flex-col sm:flex-row gap-6 items-start sm:items-center">
                   <div className="relative w-full sm:w-32 h-32 rounded-xl overflow-hidden bg-zinc-100 flex-shrink-0">
                     {item.image ? (
-                      <Image src={item.image} alt={item.name} fill className="object-cover" />
+                      <Image src={item.image} alt={item.name} fill sizes="100px" className="object-cover" />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-xs text-zinc-400 text-center p-2 border border-dashed border-zinc-300 rounded-xl">No Image</div>
                     )}

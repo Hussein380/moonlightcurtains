@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Star, Truck, ShieldCheck, Ruler, Scissors, Home as HomeIcon } from "lucide-react";
@@ -11,6 +12,95 @@ const fetcher = async (url: string) => {
   const text = await res.text();
   try { return JSON.parse(text); } catch { return []; }
 };
+
+function HomeProductCard({ product }: { product: any }) {
+  const [currentImgIdx, setCurrentImgIdx] = React.useState(0);
+  const images = product.images || [];
+  const imageUrl = images[currentImgIdx]?.url;
+
+  const formatPrice = (p: number) =>
+    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES", maximumFractionDigits: 0 }).format(p);
+
+  return (
+    <div className="group flex flex-col bg-white border border-zinc-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-zinc-200 transition-all duration-300 relative">
+      <div className="relative h-72 bg-zinc-100 overflow-hidden block">
+        {imageUrl ? (
+          <>
+            <Link href={`/products/${product.slug}`} className="absolute inset-0 z-0">
+              <Image src={imageUrl} alt={product.name} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+            </Link>
+            {images.length > 1 && (
+              <>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCurrentImgIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-zinc-800 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-10"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCurrentImgIdx((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-zinc-800 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white z-10"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+                  {images.map((_: any, idx: number) => (
+                    <div 
+                      key={idx} 
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${idx === currentImgIdx ? 'bg-white scale-125' : 'bg-white/50'}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <Link href={`/products/${product.slug}`} className="absolute inset-0 z-0 flex items-center justify-center text-zinc-400 text-sm">No Image</Link>
+        )}
+      </div>
+      <div className="p-6 flex-1 flex flex-col">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{product.roomType || "Curtain Fabric"}</p>
+          {product.highDemand && (
+            <span className="text-[10px] font-bold text-red-600 animate-pulse bg-red-50 px-2 py-0.5 rounded-full border border-red-100 flex items-center gap-1">
+              🔥 High Demand
+            </span>
+          )}
+        </div>
+        <Link href={`/products/${product.slug}`} className="font-bold text-xl mb-3 text-zinc-900 hover:text-[#D4AF37] transition-colors line-clamp-2">
+          {product.name}
+        </Link>
+        <div className="mt-auto flex flex-col gap-1 pt-4 border-t border-zinc-100">
+          {product.retailPrice && product.retailPrice > product.pricePerMeter ? (
+            <>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-xs text-red-500 font-medium line-through">Market: {formatPrice(product.retailPrice)}</p>
+                <div className="bg-[#D4AF37]/10 text-[#D4AF37] px-1.5 py-0.5 rounded text-[10px] font-bold">
+                  Save {Math.round(((product.retailPrice - product.pricePerMeter) / product.retailPrice) * 100)}%
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-[#D4AF37] font-bold text-xl">{formatPrice(product.pricePerMeter)} <span className="text-xs text-zinc-500 font-normal">/ meter</span></p>
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center justify-between">
+              <p className="text-[#D4AF37] font-bold text-lg">{formatPrice(product.pricePerMeter)} <span className="text-xs text-zinc-500 font-normal">/ meter</span></p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const { data: rawProducts } = useSWR(`${API_BASE}/products`, fetcher);
@@ -62,7 +152,7 @@ export default function Home() {
                 </div>
                 <Link href={`/products/${products[0].slug}`} className="block relative w-full h-64 rounded-xl overflow-hidden mb-4 bg-zinc-100">
                   {products[0].images?.[0]?.url ? (
-                    <Image src={products[0].images[0].url} alt={products[0].name} fill className="object-cover" />
+                    <Image src={products[0].images[0].url} alt={products[0].name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">No Image</div>
                   )}
@@ -77,11 +167,11 @@ export default function Home() {
                     )}
                   </div>
                   {products[0].retailPrice && products[0].retailPrice > products[0].pricePerMeter && (
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-xs text-zinc-400 line-through">Market: {formatPrice(products[0].retailPrice)}</p>
-                      <span className="text-[10px] font-bold text-white bg-zinc-900 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                        Wholesale Deal
-                      </span>
+                    <div className="flex items-center gap-3">
+                      <p className="text-xs text-red-500 font-medium line-through">Market: {formatPrice(products[0].retailPrice)}</p>
+                      <div className="bg-[#D4AF37]/20 text-[#D4AF37] px-2 py-0.5 rounded text-[10px] font-bold">
+                        Save {Math.round(((products[0].retailPrice - products[0].pricePerMeter) / products[0].retailPrice) * 100)}%
+                      </div>
                     </div>
                   )}
                   <div className="flex justify-between items-end">
@@ -189,52 +279,9 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {products.map((product: any) => {
-                const imageUrl = product.images?.[0]?.url;
-                return (
-                  <div key={product.id} className="group flex flex-col bg-white border border-zinc-100 rounded-2xl overflow-hidden hover:shadow-xl hover:border-zinc-200 transition-all duration-300">
-                    <Link href={`/products/${product.slug}`} className="relative h-72 bg-zinc-100 overflow-hidden block">
-                      {imageUrl ? (
-                        <Image src={imageUrl} alt={product.name} fill className="object-cover transition-transform duration-700 group-hover:scale-105" />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-zinc-400 text-sm">No Image</div>
-                      )}
-                    </Link>
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider">{product.roomType || "Curtain Fabric"}</p>
-                        {product.highDemand && (
-                          <span className="text-[10px] font-bold text-red-600 animate-pulse bg-red-50 px-2 py-0.5 rounded-full border border-red-100 flex items-center gap-1">
-                            🔥 High Demand
-                          </span>
-                        )}
-                      </div>
-                      <Link href={`/products/${product.slug}`} className="font-bold text-xl mb-3 text-zinc-900 hover:text-[#D4AF37] transition-colors line-clamp-2">
-                        {product.name}
-                      </Link>
-                      <div className="mt-auto flex flex-col gap-1 pt-4 border-t border-zinc-100">
-                        {product.retailPrice && product.retailPrice > product.pricePerMeter ? (
-                          <>
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs text-zinc-400 line-through">Market: {formatPrice(product.retailPrice)}</p>
-                              <span className="text-[10px] font-bold text-white bg-zinc-900 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                                Wholesale Deal
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <p className="text-[#D4AF37] font-bold text-xl">{formatPrice(product.pricePerMeter)} <span className="text-xs text-zinc-500 font-normal">/ meter</span></p>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="flex items-center justify-between">
-                            <p className="text-[#D4AF37] font-bold text-lg">{formatPrice(product.pricePerMeter)} <span className="text-xs text-zinc-500 font-normal">/ meter</span></p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {products.map((product: any) => (
+                <HomeProductCard key={product.id} product={product} />
+              ))}
             </div>
           )}
         </div>

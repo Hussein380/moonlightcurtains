@@ -111,11 +111,11 @@ export default function CustomOrderPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Window Width (m) *</label>
-              <input required name="windowWidth" value={form.windowWidth} onChange={handleChange} type="number" step="0.1" min="0.5" className="w-full border border-zinc-300 rounded-md h-12 px-4 focus:ring-[#D4AF37] focus:border-[#D4AF37]" placeholder="e.g. 2.5" />
+              <input required name="windowWidth" value={form.windowWidth} onChange={handleChange} onWheel={(e) => (e.target as HTMLElement).blur()} type="number" step="0.1" min="0.5" className="w-full border border-zinc-300 rounded-md h-12 px-4 focus:ring-[#D4AF37] focus:border-[#D4AF37]" placeholder="e.g. 2.5" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Window Height (m) *</label>
-              <input required name="windowHeight" value={form.windowHeight} onChange={handleChange} type="number" step="0.1" min="0.5" className="w-full border border-zinc-300 rounded-md h-12 px-4 focus:ring-[#D4AF37] focus:border-[#D4AF37]" placeholder="e.g. 2.8" />
+              <input required name="windowHeight" value={form.windowHeight} onChange={handleChange} onWheel={(e) => (e.target as HTMLElement).blur()} type="number" step="0.1" min="0.5" className="w-full border border-zinc-300 rounded-md h-12 px-4 focus:ring-[#D4AF37] focus:border-[#D4AF37]" placeholder="e.g. 2.8" />
             </div>
           </div>
 

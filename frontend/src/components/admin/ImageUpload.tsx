@@ -25,7 +25,7 @@ export default function ImageUpload({ value, onAdd, onRemove }: ImageUploadProps
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <Image fill className="object-cover" alt="Uploaded Image" src={url} />
+            <Image fill sizes="200px" className="object-cover" alt="Uploaded Image" src={url} />
           </div>
         ))}
       </div>

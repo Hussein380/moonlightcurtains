@@ -33,7 +33,8 @@ router.get('/', async (req, res) => {
 
     const products = await prisma.product.findMany({
       where: whereClause,
-      include: { category: true }
+      include: { category: true },
+      orderBy: { createdAt: 'desc' }
     });
 
     await redisSet(cacheKey, 300, JSON.stringify(products));
@@ -48,7 +49,10 @@ router.get('/', async (req, res) => {
 router.post('/', requireAuth, async (req, res) => {
   try {
     const data = req.body;
-    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const productName = data.name && data.name.trim() !== "" ? data.name.trim() : `Unnamed Fabric ${Date.now()}`;
+    const baseSlug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'product';
+    const uniqueId = Math.random().toString(36).substring(2, 8);
+    const slug = `${baseSlug}-${uniqueId}`;
 
     let defaultCategory = await prisma.category.findFirst();
     if (!defaultCategory) {
@@ -59,19 +63,19 @@ router.post('/', requireAuth, async (req, res) => {
 
     const product = await prisma.product.create({
       data: {
-        name: data.name,
+        name: productName,
         slug,
         shortDescription: data.description || "Beautiful curtain fabric.",
         description: data.description || "Detailed description...",
         categoryId: defaultCategory.id,
         fabricType: "Mixed",
-        roomType: data.roomType || "Living Room",
-        headerStyles: [data.headerStyle],
-        lightControl: data.lightControl,
+        roomType: data.roomType || "All Rooms",
+        headerStyles: data.headerStyle ? [data.headerStyle] : [],
+        lightControl: data.lightControl || "",
         pricePerMeter: parseFloat(data.pricePerMeter),
         retailPrice: data.retailPrice ? parseFloat(data.retailPrice) : null,
         highDemand: data.highDemand === true,
-        images: data.images.map((url: string) => ({ url, alt: data.name })),
+        images: data.images.map((url: string) => ({ url, alt: productName })),
         colors: data.colors && data.colors.length > 0 ? data.colors : [],
         qualities: [],
         specifications: { material: "Mixed" },
@@ -93,21 +97,25 @@ router.post('/', requireAuth, async (req, res) => {
 router.put('/:id', requireAuth, async (req, res) => {
   try {
     const data = req.body;
+    
+    // Fetch existing product to fallback to existing name if new one is empty
+    const existing = await prisma.product.findUnique({ where: { id: req.params.id as string }});
+    const productName = data.name || (existing ? existing.name : `Unnamed Fabric ${Date.now()}`);
 
     const product = await prisma.product.update({
       where: { id: req.params.id as string },
       data: {
-        name: data.name,
+        name: productName,
         shortDescription: data.description || "Beautiful curtain fabric.",
         description: data.description || "Detailed description...",
-        roomType: data.roomType,
-        headerStyles: [data.headerStyle],
-        lightControl: data.lightControl,
+        roomType: data.roomType || "All Rooms",
+        headerStyles: data.headerStyle ? [data.headerStyle] : [],
+        lightControl: data.lightControl || "",
         pricePerMeter: parseFloat(data.pricePerMeter),
         retailPrice: data.retailPrice ? parseFloat(data.retailPrice) : null,
         highDemand: data.highDemand === true,
         colors: data.colors && data.colors.length > 0 ? data.colors : [],
-        images: data.images.map((url: string) => ({ url, alt: data.name })),
+        images: data.images.map((url: string) => ({ url, alt: productName })),
       }
     });
 

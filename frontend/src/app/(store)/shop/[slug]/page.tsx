@@ -169,6 +169,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
                     min="1"
                     value={meters}
                     onChange={(e) => setMeters(Math.max(1, parseInt(e.target.value) || 1))}
+                    onWheel={(e) => (e.target as HTMLElement).blur()}
                     className="w-full text-center font-bold text-lg focus:outline-none"
                   />
                   <button 

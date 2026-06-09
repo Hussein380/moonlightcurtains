@@ -12,6 +12,7 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedColor, setSelectedColor] = useState<string>("");
+  const [currentImageIdx, setCurrentImageIdx] = useState(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -53,7 +54,8 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  const imageUrl = product.images?.[0]?.url;
+  const images = product.images || [];
+  const imageUrl = images[currentImageIdx]?.url;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl min-h-[80vh]">
@@ -63,13 +65,62 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         <div className="space-y-4">
-          <div className="relative aspect-[4/5] bg-zinc-100 rounded-xl overflow-hidden shadow-lg border border-zinc-200">
+          <div className="relative aspect-[4/5] bg-zinc-100 rounded-xl overflow-hidden shadow-lg border border-zinc-200 group">
             {imageUrl ? (
-              <Image src={imageUrl} alt={product.name} fill className="object-cover" />
+              <>
+                <Image src={imageUrl} alt={product.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-opacity duration-300" />
+                {images.length > 1 && (
+                  <>
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentImageIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                      }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-zinc-800 shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setCurrentImageIdx((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-zinc-800 shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
+                    >
+                      <ChevronLeft className="w-6 h-6 rotate-180" />
+                    </button>
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      {images.map((_: any, idx: number) => (
+                        <div 
+                          key={idx} 
+                          className={`w-2 h-2 rounded-full transition-all ${idx === currentImageIdx ? 'bg-white scale-125' : 'bg-white/50'}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-zinc-400">No Image</div>
             )}
           </div>
+
+          {/* Thumbnails */}
+          {images.length > 1 && (
+            <div className="flex gap-4 overflow-x-auto pb-2 px-1 snap-x">
+              {images.map((img: any, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentImageIdx(idx)}
+                  className={`relative w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all snap-start
+                    ${idx === currentImageIdx ? 'border-[#D4AF37] opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}
+                  `}
+                >
+                  <Image src={img.url} alt={`Thumbnail ${idx + 1}`} fill sizes="100px" className="object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col">
@@ -89,7 +140,7 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
           <div className="flex flex-col gap-1 mb-6 border-b border-zinc-100 pb-6">
             {product.retailPrice && product.retailPrice > product.pricePerMeter && (
               <div className="flex items-center gap-3">
-                <p className="text-sm text-zinc-400 line-through">Market Retail: {formatPrice(product.retailPrice)}</p>
+                <p className="text-sm text-red-500 font-medium line-through">Market Retail: {formatPrice(product.retailPrice)}</p>
                 <span className="text-xs font-bold text-white bg-[#D4AF37] px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
                   Wholesale Deal (Save {Math.round(((product.retailPrice - product.pricePerMeter) / product.retailPrice) * 100)}%)
                 </span>

@@ -1,7 +1,7 @@
 "use client";
 
-import { Plus, Loader2, CheckCircle, Edit, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { Plus, Loader2, CheckCircle, Edit, Trash2, X, Image as ImageIcon } from "lucide-react";
+import { useState, useEffect } from "react";
 import ImageUpload from "@/components/admin/ImageUpload";
 import useSWR, { mutate } from "swr";
 import Image from "next/image";
@@ -9,9 +9,25 @@ import { getAuthToken } from "@/lib/auth";
 import { API_BASE } from "@/lib/api";
 
 const COMMON_COLORS = [
-  "White", "Off-White", "Beige", "Cream", "Grey", "Charcoal", "Black", 
-  "Blue", "Navy", "Gold", "Yellow", "Green", "Pink", "Red", "Burgundy", 
-  "Brown", "Purple", "Multi", "Various"
+  { name: "White", hex: "#FFFFFF" },
+  { name: "Off-White", hex: "#F8F8FF" },
+  { name: "Beige", hex: "#F5F5DC" },
+  { name: "Cream", hex: "#FFFDD0" },
+  { name: "Grey", hex: "#808080" },
+  { name: "Charcoal", hex: "#36454F" },
+  { name: "Black", hex: "#000000" },
+  { name: "Blue", hex: "#0000FF" },
+  { name: "Navy", hex: "#000080" },
+  { name: "Gold", hex: "#FFD700" },
+  { name: "Yellow", hex: "#FFFF00" },
+  { name: "Green", hex: "#008000" },
+  { name: "Pink", hex: "#FFC0CB" },
+  { name: "Red", hex: "#FF0000" },
+  { name: "Burgundy", hex: "#800020" },
+  { name: "Brown", hex: "#964B00" },
+  { name: "Purple", hex: "#800080" },
+  { name: "Multi", hex: "conic-gradient(red, yellow, green, blue, purple)" },
+  { name: "Various", hex: "linear-gradient(45deg, #ccc, #888)" }
 ];
 
 const fetcher = async (url: string) => {
@@ -23,26 +39,72 @@ const fetcher = async (url: string) => {
 export default function AdminProductsPage() {
   const { data: rawProducts, error, isLoading } = useSWR(`${API_BASE}/products`, fetcher);
   const products: any[] = Array.isArray(rawProducts)
-    ? rawProducts
+    ? [...rawProducts].reverse()
     : typeof rawProducts === 'string'
-    ? JSON.parse(rawProducts)
+    ? [...JSON.parse(rawProducts)].reverse()
     : [];
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 8;
+  
   // Form State
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
-  const [room, setRoom] = useState("Living Room");
-  const [headerStyle, setHeaderStyle] = useState("Grommet (Eyelet)");
-  const [lightControl, setLightControl] = useState("Sheer");
+  const [room, setRoom] = useState("All Rooms");
+  const [headerStyle, setHeaderStyle] = useState("");
+  const [lightControl, setLightControl] = useState("");
   const [colors, setColors] = useState<string[]>([]);
   const [retailPrice, setRetailPrice] = useState("");
   const [highDemand, setHighDemand] = useState(false);
   const [description, setDescription] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [isPasting, setIsPasting] = useState(false);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const handlePaste = async (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const file = items[i].getAsFile();
+          if (!file) continue;
+          
+          setIsPasting(true);
+          try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", "moonlight_preset");
+            
+            const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+              method: "POST",
+              body: formData
+            });
+            
+            const data = await res.json();
+            if (data.secure_url) {
+              setImages((prev) => [...prev, data.secure_url]);
+            }
+          } catch (error) {
+            console.error("Paste upload failed", error);
+            alert("Failed to upload pasted image. Please try again.");
+          } finally {
+            setIsPasting(false);
+          }
+        }
+      }
+    };
+
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [isModalOpen]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(price);
@@ -51,9 +113,9 @@ export default function AdminProductsPage() {
   const resetForm = () => {
     setName("");
     setPrice("");
-    setRoom("Living Room");
-    setHeaderStyle("Grommet (Eyelet)");
-    setLightControl("Sheer");
+    setRoom("All Rooms");
+    setHeaderStyle("");
+    setLightControl("");
     setColors([]);
     setRetailPrice("");
     setHighDemand(false);
@@ -68,11 +130,11 @@ export default function AdminProductsPage() {
   };
 
   const handleOpenEdit = (product: any) => {
-    setName(product.name);
-    setPrice(product.pricePerMeter.toString());
-    setRoom(product.roomType || "Living Room");
-    setHeaderStyle(product.headerStyles?.[0] || "Grommet (Eyelet)");
-    setLightControl(product.lightControl || "Sheer");
+    setName(product.name || "");
+    setPrice(product.pricePerMeter?.toString() || "");
+    setRoom(product.roomType || "All Rooms");
+    setHeaderStyle(product.headerStyles?.[0] || "");
+    setLightControl(product.lightControl || "");
     setColors(product.colors || []);
     setRetailPrice(product.retailPrice ? product.retailPrice.toString() : "");
     setHighDemand(product.highDemand || false);
@@ -105,8 +167,8 @@ export default function AdminProductsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price || images.length === 0) {
-      alert("Please provide a name, price, and at least one image.");
+    if (!price || !retailPrice || images.length === 0) {
+      alert("Please provide a price, original price, and at least one image.");
       return;
     }
 
@@ -185,12 +247,12 @@ export default function AdminProductsPage() {
           <>
             {/* Mobile/Tablet Card View (hidden on desktop) */}
             <div className="md:hidden divide-y divide-zinc-100">
-              {products?.map((product: any) => (
+              {products?.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((product: any) => (
                 <div key={product.id} className="p-4 flex items-center justify-between gap-4 hover:bg-zinc-50 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 border border-zinc-100">
                       {product.images?.[0]?.url ? (
-                        <Image src={product.images[0].url} alt={product.name} fill className="object-cover animate-fade-in" />
+                        <Image src={product.images[0].url} alt={product.name} fill sizes="50px" className="object-cover animate-fade-in" />
                       ) : null}
                     </div>
                     <div className="min-w-0">
@@ -239,12 +301,12 @@ export default function AdminProductsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
-                  {products?.map((product: any) => (
+                  {products?.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map((product: any) => (
                     <tr key={product.id} className="hover:bg-zinc-50 transition-colors">
                       <td className="p-4 flex items-center gap-4">
                         <div className="relative w-12 h-12 rounded-md overflow-hidden bg-zinc-100 flex-shrink-0">
                           {product.images?.[0]?.url ? (
-                            <Image src={product.images[0].url} alt={product.name} fill className="object-cover" />
+                            <Image src={product.images[0].url} alt={product.name} fill sizes="50px" className="object-cover" />
                           ) : null}
                         </div>
                         <span className="font-medium text-zinc-900">{product.name}</span>
@@ -278,6 +340,42 @@ export default function AdminProductsPage() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {Math.ceil((products?.length || 0) / ITEMS_PER_PAGE) > 1 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between p-4 border-t border-zinc-200 bg-zinc-50 gap-4">
+                <p className="text-sm text-zinc-500">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, products.length)} of {products.length} products
+                </p>
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 border border-zinc-300 rounded-md text-sm disabled:opacity-50 hover:bg-white transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: Math.ceil(products.length / ITEMS_PER_PAGE) }).map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i + 1)}
+                        className={`w-8 h-8 flex items-center justify-center rounded-md text-sm font-medium transition-colors ${currentPage === i + 1 ? 'bg-[#D4AF37] text-white shadow-sm' : 'text-zinc-600 hover:bg-white border border-transparent hover:border-zinc-300'}`}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <button 
+                    onClick={() => setCurrentPage(p => Math.min(Math.ceil(products.length / ITEMS_PER_PAGE), p + 1))}
+                    disabled={currentPage === Math.ceil(products.length / ITEMS_PER_PAGE)}
+                    className="px-3 py-1 border border-zinc-300 rounded-md text-sm disabled:opacity-50 hover:bg-white transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -301,14 +399,13 @@ export default function AdminProductsPage() {
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">Product Name *</label>
+                  <label className="block text-sm font-medium text-zinc-700 mb-2">Product Name</label>
                   <input 
                     type="text" 
-                    required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full border border-zinc-300 rounded-md p-2.5 focus:ring-[#D4AF37] focus:border-[#D4AF37]" 
-                    placeholder="e.g. Turkish Luxury Velvet" 
+                    placeholder="e.g. Turkish Luxury Velvet (Optional)" 
                   />
                 </div>
                 <div>
@@ -318,16 +415,19 @@ export default function AdminProductsPage() {
                     required
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
+                    onWheel={(e) => (e.target as HTMLElement).blur()}
                     className="w-full border border-zinc-300 rounded-md p-2.5 focus:ring-[#D4AF37] focus:border-[#D4AF37]" 
                     placeholder="e.g. 950" 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">Market Retail Price (Optional)</label>
+                  <label className="block text-sm font-medium text-zinc-700 mb-2">Market Retail Price (KES) *</label>
                   <input 
                     type="number" 
+                    required
                     value={retailPrice}
                     onChange={(e) => setRetailPrice(e.target.value)}
+                    onWheel={(e) => (e.target as HTMLElement).blur()}
                     className="w-full border border-zinc-300 rounded-md p-2.5 focus:ring-[#D4AF37] focus:border-[#D4AF37]" 
                     placeholder="e.g. 1500" 
                   />
@@ -351,6 +451,7 @@ export default function AdminProductsPage() {
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 mb-2">Room Category</label>
                   <select value={room} onChange={(e) => setRoom(e.target.value)} className="w-full border border-zinc-300 rounded-md p-2.5 bg-white focus:ring-[#D4AF37] focus:border-[#D4AF37]">
+                    <option>All Rooms</option>
                     <option>Living Room</option>
                     <option>Bedroom</option>
                     <option>Office</option>
@@ -361,6 +462,7 @@ export default function AdminProductsPage() {
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 mb-2">Header Style</label>
                   <select value={headerStyle} onChange={(e) => setHeaderStyle(e.target.value)} className="w-full border border-zinc-300 rounded-md p-2.5 bg-white focus:ring-[#D4AF37] focus:border-[#D4AF37]">
+                    <option value="">None</option>
                     <option>Grommet (Eyelet)</option>
                     <option>Rod Pocket</option>
                     <option>Pinch Pleat</option>
@@ -373,6 +475,7 @@ export default function AdminProductsPage() {
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 mb-2">Light Control</label>
                   <select value={lightControl} onChange={(e) => setLightControl(e.target.value)} className="w-full border border-zinc-300 rounded-md p-2.5 bg-white focus:ring-[#D4AF37] focus:border-[#D4AF37]">
+                    <option value="">None</option>
                     <option>Sheer</option>
                     <option>Light-Filtering</option>
                     <option>Blackout</option>
@@ -383,34 +486,50 @@ export default function AdminProductsPage() {
               <div>
                 <label className="block text-sm font-medium text-zinc-700 mb-3">Available Colors (Tick all that apply)</label>
                 <div className="flex flex-wrap gap-2">
-                  {COMMON_COLORS.map((colorName) => (
+                  {COMMON_COLORS.map((color) => (
                     <label 
-                      key={colorName} 
+                      key={color.name} 
                       className={`cursor-pointer px-3 py-1.5 border rounded-full text-sm font-medium transition-colors select-none flex items-center gap-2
-                        ${colors.includes(colorName) 
+                        ${colors.includes(color.name) 
                           ? 'bg-[#D4AF37] border-[#D4AF37] text-white' 
                           : 'bg-white border-zinc-300 text-zinc-700 hover:border-[#D4AF37]'}`}
                     >
+                      <div 
+                        className="w-3.5 h-3.5 rounded-full border border-zinc-300 shadow-sm flex-shrink-0" 
+                        style={{ background: color.hex }}
+                      />
                       <input 
                         type="checkbox" 
                         className="hidden"
-                        checked={colors.includes(colorName)}
+                        checked={colors.includes(color.name)}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setColors([...colors, colorName]);
+                            setColors([...colors, color.name]);
                           } else {
-                            setColors(colors.filter(c => c !== colorName));
+                            setColors(colors.filter(c => c !== color.name));
                           }
                         }}
                       />
-                      {colorName}
+                      {color.name}
                     </label>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-zinc-700 mb-2">Product Images *</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-zinc-700">Product Images *</label>
+                  <div className="text-xs text-zinc-500 bg-zinc-100 px-2 py-1 rounded border border-zinc-200 flex items-center gap-1">
+                    <ImageIcon className="w-3 h-3" />
+                    You can paste images (Ctrl+V) directly anywhere here
+                  </div>
+                </div>
+                {isPasting && (
+                  <div className="mb-4 flex items-center gap-2 text-sm text-[#D4AF37] font-medium bg-yellow-50 p-3 rounded-md border border-yellow-100 animate-pulse">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Uploading pasted image...
+                  </div>
+                )}
                 <ImageUpload 
                   value={images} 
                   onAdd={(url) => setImages((prev) => [...prev, url])} 

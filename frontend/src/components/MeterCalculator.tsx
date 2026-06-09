@@ -24,6 +24,7 @@ export function MeterCalculator({
 }: MeterCalculatorProps) {
   const [meters, setMeters] = useState(5);
   const [added, setAdded] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
   const addItem = useCartStore((state) => state.addItem);
   const router = useRouter();
 
@@ -49,6 +50,7 @@ export function MeterCalculator({
       totalPrice: meters * pricePerMeter,
     });
     setAdded(true);
+    setShowCheckout(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
@@ -103,7 +105,7 @@ export function MeterCalculator({
             <><ShoppingCart className="w-5 h-5" /> Add to Cart</>
           )}
         </button>
-        {added && (
+        {showCheckout && (
           <button
             type="button"
             onClick={() => router.push("/cart")}
