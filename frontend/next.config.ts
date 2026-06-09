@@ -21,18 +21,6 @@ const nextConfig: NextConfig = {
       {
         source: '/api/:path*',
         destination: 'http://localhost:5000/api/:path*', // Proxy to Backend
-      },
-    ];
-  },
-  async redirects() {
-    return [
-      {
-        source: '/shop',
-        destination: '/',
-        permanent: true, // 301 redirect
-      },
-    ];
-  },
 };
 
 export default nextConfig;

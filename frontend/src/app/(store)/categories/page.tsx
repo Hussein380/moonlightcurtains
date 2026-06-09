@@ -14,7 +14,7 @@ export default function CategoriesPage() {
       <h1 className="text-4xl font-serif font-bold text-zinc-900 mb-8">Shop by Room Category</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {categories.map((cat, i) => (
-          <Link href={`/?roomType=${cat.name.replace(' Curtains', '')}`} key={i} className="group relative h-80 overflow-hidden rounded-lg">
+          <Link href={`/shop?roomType=${cat.name.replace(' Curtains', '')}`} key={i} className="group relative h-80 overflow-hidden rounded-lg">
             <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors z-10" />
             <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style={{ backgroundImage: `url(${cat.img})` }} />
             <div className="absolute inset-0 z-20 flex items-center justify-center">
