@@ -49,8 +49,8 @@ router.get('/', async (req, res) => {
 router.post('/', requireAuth, async (req, res) => {
   try {
     const data = req.body;
-    const productName = data.name && data.name.trim() !== "" ? data.name.trim() : `Unnamed Fabric ${Date.now()}`;
-    const baseSlug = productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'product';
+    const productName = data.name ? data.name.trim() : "";
+    const baseSlug = productName ? productName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : 'product';
     const uniqueId = Math.random().toString(36).substring(2, 8);
     const slug = `${baseSlug}-${uniqueId}`;
 
@@ -98,9 +98,9 @@ router.put('/:id', requireAuth, async (req, res) => {
   try {
     const data = req.body;
     
-    // Fetch existing product to fallback to existing name if new one is empty
+    // Fetch existing product to fallback to existing name if new one is not provided in request
     const existing = await prisma.product.findUnique({ where: { id: req.params.id as string }});
-    const productName = data.name || (existing ? existing.name : `Unnamed Fabric ${Date.now()}`);
+    const productName = data.name !== undefined ? data.name.trim() : (existing ? existing.name : "");
 
     const product = await prisma.product.update({
       where: { id: req.params.id as string },

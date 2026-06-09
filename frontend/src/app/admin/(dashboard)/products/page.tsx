@@ -39,9 +39,9 @@ const fetcher = async (url: string) => {
 export default function AdminProductsPage() {
   const { data: rawProducts, error, isLoading } = useSWR(`${API_BASE}/products`, fetcher);
   const products: any[] = Array.isArray(rawProducts)
-    ? [...rawProducts].reverse()
+    ? [...rawProducts].sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime())
     : typeof rawProducts === 'string'
-    ? [...JSON.parse(rawProducts)].reverse()
+    ? [...JSON.parse(rawProducts)].sort((a: any, b: any) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime())
     : [];
   
   const [isModalOpen, setIsModalOpen] = useState(false);

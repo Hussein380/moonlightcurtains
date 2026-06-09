@@ -152,7 +152,18 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
           </div>
 
           <div className="prose prose-zinc mb-8 text-zinc-600 leading-relaxed">
-            <p>{product.description}</p>
+            <div className="space-y-3">
+              {product.description?.split(',').map((line: string, i: number) => {
+                const trimmed = line.trim();
+                if (!trimmed) return null;
+                return (
+                  <p key={i} className="flex items-start gap-2">
+                    <span className="text-[#D4AF37] mt-1.5 w-1.5 h-1.5 rounded-full bg-[#D4AF37] flex-shrink-0"></span>
+                    <span>{trimmed}</span>
+                  </p>
+                );
+              })}
+            </div>
             <ul className="mt-6 space-y-3 list-none pl-0">
               <li className="flex items-center gap-3"><Check className="w-5 h-5 text-[#D4AF37]" /> <strong>Fabric:</strong> {product.fabricType || "Premium Blend"}</li>
               <li className="flex items-center gap-3"><Check className="w-5 h-5 text-[#D4AF37]" /> <strong>Header:</strong> {product.headerStyles?.[0] || "Eyelet"}</li>

@@ -128,9 +128,18 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             KSh {product.pricePerMeter.toLocaleString()} <span className="text-sm text-zinc-500 font-normal">/ meter</span>
           </p>
 
-          <p className="text-zinc-600 mb-8 leading-relaxed">
-            {product.description}
-          </p>
+          <div className="mb-8 space-y-3 text-zinc-600 leading-relaxed">
+            {product.description?.split(',').map((line: string, i: number) => {
+              const trimmed = line.trim();
+              if (!trimmed) return null;
+              return (
+                <p key={i} className="flex items-start gap-2">
+                  <span className="text-[#D4AF37] mt-1.5 w-1.5 h-1.5 rounded-full bg-[#D4AF37] flex-shrink-0"></span>
+                  <span>{trimmed}</span>
+                </p>
+              );
+            })}
+          </div>
 
           {/* Color Selection */}
           {product.colors && product.colors.length > 0 && (

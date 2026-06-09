@@ -32,8 +32,8 @@ export function Navbar() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8 text-sm font-semibold">
-          <Link href="/" className="hover:text-[#D4AF37] transition-colors">Home</Link>
-          <Link href="/shop" className="hover:text-[#D4AF37] transition-colors">Shop</Link>
+          <Link href="/home" className="hover:text-[#D4AF37] transition-colors">Home</Link>
+          <Link href="/" className="hover:text-[#D4AF37] transition-colors">Shop</Link>
           <Link href="/categories" className="hover:text-[#D4AF37] transition-colors">Categories</Link>
           <Link href="/guide" className="hover:text-[#D4AF37] transition-colors">Curtain Guide</Link>
           <Link href="/about" className="hover:text-[#D4AF37] transition-colors">About Us</Link>
@@ -59,8 +59,8 @@ export function Navbar() {
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden absolute top-20 left-0 w-full bg-zinc-950 border-b border-zinc-800 shadow-xl py-4 px-4 flex flex-col gap-4 text-sm font-semibold">
-          <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#D4AF37] transition-colors block py-2 border-b border-zinc-900">Home</Link>
-          <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#D4AF37] transition-colors block py-2 border-b border-zinc-900">Shop</Link>
+          <Link href="/home" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#D4AF37] transition-colors block py-2 border-b border-zinc-900">Home</Link>
+          <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#D4AF37] transition-colors block py-2 border-b border-zinc-900">Shop</Link>
           <Link href="/categories" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#D4AF37] transition-colors block py-2 border-b border-zinc-900">Categories</Link>
           <Link href="/guide" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#D4AF37] transition-colors block py-2 border-b border-zinc-900">Curtain Guide</Link>
           <Link href="/about" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#D4AF37] transition-colors block py-2 border-b border-zinc-900">About Us</Link>
