@@ -49,7 +49,7 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
     return (
       <div className="flex flex-col h-[60vh] items-center justify-center gap-4">
         <h1 className="text-2xl font-bold">Fabric Not Found</h1>
-        <Link href="/shop" className="text-[#D4AF37] hover:underline">Return to Shop</Link>
+        <Link href="/" className="text-[#D4AF37] hover:underline">Return to Shop</Link>
       </div>
     );
   }
@@ -59,7 +59,7 @@ export default function ProductClient({ params }: { params: Promise<{ slug: stri
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl min-h-[80vh]">
-      <Link href="/shop" className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-900 mb-8 transition-colors">
+      <Link href="/" className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-900 mb-8 transition-colors">
         <ChevronLeft className="w-4 h-4" /> Back to Shop
       </Link>
       

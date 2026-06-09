@@ -134,7 +134,7 @@ export default function Home() {
               Transform your home with premium Turkish fabrics, elegant sheers, and room-darkening blackouts. Sold by the meter at unbeatable Eastleigh prices, delivered straight to your door anywhere in Kenya.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/shop" className="bg-[#D4AF37] hover:bg-[#C5A059] text-white px-8 py-4 rounded-md font-bold transition-all shadow-lg shadow-[#D4AF37]/30 flex items-center justify-center gap-2 hover:-translate-y-1">
+              <Link href="/" className="bg-[#D4AF37] hover:bg-[#C5A059] text-white px-8 py-4 rounded-md font-bold transition-all shadow-lg shadow-[#D4AF37]/30 flex items-center justify-center gap-2 hover:-translate-y-1">
                 Explore Fabrics <ArrowRight className="w-5 h-5" />
               </Link>
               <Link href="/custom-order" className="bg-transparent border-2 border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white px-8 py-4 rounded-md font-bold transition-all flex items-center justify-center">
@@ -248,7 +248,7 @@ export default function Home() {
               { name: "Bedroom", img: "https://images.unsplash.com/photo-1616594039964-ae9021a400a0?q=80&w=2080&auto=format&fit=crop" },
               { name: "Kids Room", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2069&auto=format&fit=crop" }
             ].map((cat, i) => (
-              <Link href={`/shop`} key={i} className="group relative h-80 md:h-96 overflow-hidden rounded-xl shadow-md">
+              <Link href={`/?roomType=${cat.name}`} key={i} className="group relative h-80 md:h-96 overflow-hidden rounded-xl shadow-md">
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors z-10" />
                 <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style={{ backgroundImage: `url(${cat.img})` }} />
                 <div className="absolute inset-0 z-20 flex items-center justify-center">
@@ -270,7 +270,7 @@ export default function Home() {
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-zinc-900 mb-4">Latest Arrivals</h2>
               <div className="w-24 h-1 bg-[#D4AF37] mx-auto md:mx-0" />
             </div>
-            <Link href="/shop" className="flex items-center text-zinc-600 hover:text-[#D4AF37] font-medium border border-zinc-200 hover:border-[#D4AF37] px-6 py-3 rounded-full transition-colors">
+            <Link href="/" className="flex items-center text-zinc-600 hover:text-[#D4AF37] font-medium border border-zinc-200 hover:border-[#D4AF37] px-6 py-3 rounded-full transition-colors">
               View All Collection <ArrowRight className="w-4 h-4 ml-2" />
             </Link>
           </div>

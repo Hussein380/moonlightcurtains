@@ -120,9 +120,12 @@ function ProductCard({ product }: { product: any }) {
   );
 }
 
+import { useSearchParams } from "next/navigation";
+
 export default function ShopPage() {
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
-  const [roomType, setRoomType] = useState("All");
+  const [roomType, setRoomType] = useState(searchParams.get("roomType") || "All");
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 12;

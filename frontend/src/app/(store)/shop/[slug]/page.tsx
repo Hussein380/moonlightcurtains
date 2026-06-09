@@ -79,14 +79,14 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
       <div className="min-h-[70vh] flex flex-col items-center justify-center">
         <AlertCircle className="w-12 h-12 text-red-400 mb-4" />
         <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-        <Link href="/shop" className="text-[#D4AF37] hover:underline">Return to Shop</Link>
+        <Link href="/" className="text-[#D4AF37] hover:underline">Return to Shop</Link>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 py-12 min-h-[70vh]">
-      <Link href="/shop" className="text-zinc-500 hover:text-[#D4AF37] inline-flex items-center gap-2 mb-8 transition-colors">
+      <Link href="/" className="text-zinc-500 hover:text-[#D4AF37] inline-flex items-center gap-2 mb-8 transition-colors">
         <ArrowLeft className="w-4 h-4" /> Back to Shop
       </Link>
 
